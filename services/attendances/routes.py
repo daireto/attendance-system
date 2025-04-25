@@ -21,7 +21,7 @@ router = APIRouter()
 )
 @requires(UserRole.ADMIN)
 async def create_attendance(request: Request, data: AttendanceCreate):
-    attendance = await create_new_attendance(data)
+    attendance = await create_new_attendance(request.user.uid, data)
     return AttendanceResponse.model_validate(attendance)
 
 

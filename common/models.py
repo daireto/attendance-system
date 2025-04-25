@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .custom_types import PydanticType
 from .enums import (
     DocumentType,
+    Gender,
     MedicalCenterType,
     OwnershipType,
     UserRole,
@@ -30,17 +31,17 @@ class Attendance(BaseModel):
     __tablename__ = 'attendances'
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    full_name: Mapped[str] = mapped_column(nullable=False)
-    document: Mapped[str] = mapped_column(nullable=False, unique=True)
+    full_name: Mapped[str] = mapped_column()
+    document: Mapped[str] = mapped_column(unique=True)
     document_type: Mapped[DocumentType] = mapped_column(
-        Enum(DocumentType), nullable=False
+        Enum(DocumentType),
     )
-    birth_date: Mapped[datetime] = mapped_column(nullable=False)
-    address: Mapped[str] = mapped_column(nullable=False)
-    reason: Mapped[str] = mapped_column(nullable=False)
-    admission_date: Mapped[datetime] = mapped_column(nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender))
+    birth_date: Mapped[datetime] = mapped_column()
+    address: Mapped[str] = mapped_column()
+    reason: Mapped[str] = mapped_column()
     additional_data: Mapped[dict[str, object]] = mapped_column(
-        JSON, nullable=False
+        JSON, nullable=True
     )
     company_id: Mapped[UUID] = mapped_column(
         ForeignKey('companies.uid', ondelete='RESTRICT')
@@ -61,19 +62,21 @@ class Company(BaseModel):
     __tablename__ = 'companies'
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    nit: Mapped[str] = mapped_column(nullable=False, unique=True)
-    name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    phone: Mapped[str] = mapped_column(nullable=False, unique=True)
+    nit: Mapped[str] = mapped_column(unique=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    phone: Mapped[str] = mapped_column(unique=True)
     center_type: Mapped[MedicalCenterType] = mapped_column(
-        Enum(MedicalCenterType), nullable=False
+        Enum(MedicalCenterType),
     )
     ownership_type: Mapped[OwnershipType] = mapped_column(
-        Enum(OwnershipType), nullable=False
+        Enum(OwnershipType),
     )
-    addresses: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    addresses: Mapped[list[str]] = mapped_column(
+        JSON,
+    )
     additional_attendance_fields: Mapped[list[AdditionalAttendanceField]] = (
         mapped_column(
-            PydanticType(list[AdditionalAttendanceField]), nullable=False
+            PydanticType(list[AdditionalAttendanceField]), nullable=True
         )
     )
     user_id: Mapped[UUID] = mapped_column(
@@ -102,9 +105,9 @@ class ContactNumber(BaseModel):
     )
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    name: Mapped[str] = mapped_column(nullable=False)
-    country_code: Mapped[int] = mapped_column(nullable=False)
-    number: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column()
+    country_code: Mapped[int] = mapped_column()
+    number: Mapped[str] = mapped_column()
 
     company_id: Mapped[Optional[UUID]] = mapped_column(
         ForeignKey('companies.uid', ondelete='RESTRICT')
@@ -118,17 +121,19 @@ class User(BaseModel):
     __tablename__ = 'users'
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    username: Mapped[str] = mapped_column(nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(nullable=False)
-    email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    document: Mapped[str] = mapped_column(nullable=False, unique=True)
+    username: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str] = mapped_column()
+    email: Mapped[str] = mapped_column(unique=True)
+    document: Mapped[str] = mapped_column(unique=True)
     document_type: Mapped[DocumentType] = mapped_column(
-        Enum(DocumentType), nullable=False
+        Enum(DocumentType),
     )
-    first_name: Mapped[str] = mapped_column(nullable=False)
-    last_name: Mapped[str] = mapped_column(nullable=False)
-    birth_date: Mapped[datetime] = mapped_column(nullable=False)
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False)
+    first_name: Mapped[str] = mapped_column()
+    last_name: Mapped[str] = mapped_column()
+    birth_date: Mapped[datetime] = mapped_column()
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole),
+    )
 
     contact_numbers: Mapped[list['ContactNumber']] = relationship()
     attendances: Mapped[list['Attendance']] = relationship(

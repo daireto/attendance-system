@@ -10,6 +10,19 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @prompt accessToken
+# @prompt search
+GET http://{{host}}/attendances?search={{search}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt skip
+# @prompt limit
+GET http://{{host}}/attendances?skip={{skip}}&limit={{limit}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
 # @prompt uid
 GET http://{{host}}/attendances/{{uid}} HTTP/1.1
 Authorization: Bearer {{accessToken}}
@@ -24,11 +37,9 @@ Content-Type: application/json
     "full_name": "John Doe",
     "document": "123456789",
     "document_type": "CC",
+    "gender": "male",
     "birth_date": "2000-01-01",
     "address": "123 Main St",
-    "reason": "Fever",
-    "admission_date": "2023-01-01",
-    "additional_data": {},
-    "company_id": "00000000-0000-0000-0000-000000000000",
-    "user_id": "00000000-0000-0000-0000-000000000000"
+    "reason": "Fiebre muy alta",
+    "company_id": "2458948b-29d3-4658-b3b5-9a3eda7293e3"
 }

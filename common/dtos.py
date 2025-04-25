@@ -5,7 +5,13 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from common.models import AdditionalAttendanceField
 
-from .enums import DocumentType, MedicalCenterType, OwnershipType, UserRole
+from .enums import (
+    DocumentType,
+    Gender,
+    MedicalCenterType,
+    OwnershipType,
+    UserRole,
+)
 
 
 class ResourceDelete(BaseModel):
@@ -17,13 +23,12 @@ class AttendanceBase(BaseModel):
     full_name: str = Field(min_length=2, max_length=100)
     document: str = Field(min_length=8, max_length=12)
     document_type: DocumentType
+    gender: Gender
     birth_date: datetime
     address: str = Field(min_length=2, max_length=100)
     reason: str = Field(min_length=2, max_length=100)
-    admission_date: datetime
-    additional_data: dict[str, object] = {}
+    additional_data: dict[str, object] | None = None
     company_id: UUID
-    user_id: UUID
 
 
 class AttendanceCreate(AttendanceBase):
@@ -37,11 +42,11 @@ class AttendanceResponse(BaseModel):
     full_name: str
     document: str
     document_type: DocumentType
+    gender: Gender
     birth_date: datetime
     address: str
     reason: str
-    admission_date: datetime
-    additional_data: dict[str, object] = {}
+    additional_data: dict[str, object] | None = {}
     company_id: UUID
     user_id: UUID
 
@@ -53,7 +58,7 @@ class CompanyBase(BaseModel):
     center_type: MedicalCenterType
     ownership_type: OwnershipType
     addresses: list[str] = []
-    additional_attendance_fields: list[AdditionalAttendanceField] = []
+    additional_attendance_fields: list[AdditionalAttendanceField] | None = None
     user_id: UUID
 
 
@@ -74,7 +79,7 @@ class CompanyResponse(BaseModel):
     phone: str
     center_type: MedicalCenterType
     ownership_type: OwnershipType
-    additional_attendance_fields: list[AdditionalAttendanceField] = []
+    additional_attendance_fields: list[AdditionalAttendanceField] | None = None
     user_id: UUID
 
 

@@ -10,6 +10,19 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @prompt accessToken
+# @prompt search
+GET http://{{host}}/users?search={{search}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt skip
+# @prompt limit
+GET http://{{host}}/users?skip={{skip}}&limit={{limit}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
 # @prompt username
 GET http://{{host}}/users/{{username}} HTTP/1.1
 Authorization: Bearer {{accessToken}}

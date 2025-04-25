@@ -5,6 +5,11 @@ class StrEnum(str, Enum):
     pass
 
 
+class Gender(StrEnum):
+    MALE = 'male'
+    FEMALE = 'female'
+
+
 class DocumentType(StrEnum):
     CC = 'CC'
     CE = 'CE'

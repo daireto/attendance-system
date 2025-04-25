@@ -8,7 +8,7 @@ async def fetch_companies(
     skip: int = 0, limit: int = 100, search: str | None = None
 ):
     query = Company.get_async_query()
-    query.skip(skip).limit(limit)
+    query.skip(skip).limit(limit if limit > 0 else 100).sort('-created_at')
 
     if search:
         query.search(search)
