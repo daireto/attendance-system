@@ -83,6 +83,27 @@ class CompanyResponse(BaseModel):
     user_id: UUID
 
 
+class SuscriptionBase(BaseModel):
+    start_date: datetime
+    end_date: datetime
+    active: bool = True
+    company_id: UUID
+
+
+class SuscriptionCreate(SuscriptionBase):
+    pass
+
+
+class SuscriptionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    uid: UUID
+    start_date: datetime
+    end_date: datetime
+    active: bool
+    company_id: UUID
+
+
 class UserBase(BaseModel):
     email: str = Field(min_length=5, max_length=70)
     document: str = Field(min_length=8, max_length=12)

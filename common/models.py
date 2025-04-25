@@ -40,7 +40,7 @@ class Attendance(BaseModel):
     birth_date: Mapped[datetime] = mapped_column()
     address: Mapped[str] = mapped_column()
     reason: Mapped[str] = mapped_column()
-    additional_data: Mapped[dict[str, object]] = mapped_column(
+    additional_data: Mapped[Optional[dict[str, object]]] = mapped_column(
         JSON, nullable=True
     )
     company_id: Mapped[UUID] = mapped_column(
@@ -74,7 +74,7 @@ class Company(BaseModel):
     addresses: Mapped[list[str]] = mapped_column(
         JSON,
     )
-    additional_attendance_fields: Mapped[list[AdditionalAttendanceField]] = (
+    additional_attendance_fields: Mapped[Optional[list[AdditionalAttendanceField]]] = (
         mapped_column(
             PydanticType(list[AdditionalAttendanceField]), nullable=True
         )
@@ -83,6 +83,7 @@ class Company(BaseModel):
         ForeignKey('users.uid', ondelete='RESTRICT')
     )
 
+    suscription: Mapped[Optional['Suscription']] = relationship(back_populates='company')
     user: Mapped['User'] = relationship(
         back_populates='companies', lazy='noload'
     )
@@ -115,6 +116,20 @@ class ContactNumber(BaseModel):
     user_id: Mapped[Optional[UUID]] = mapped_column(
         ForeignKey('users.uid', ondelete='RESTRICT')
     )
+
+
+class Suscription(BaseModel):
+    __tablename__ = 'suscriptions'
+
+    uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    company_id: Mapped[UUID] = mapped_column(
+        ForeignKey('companies.uid', ondelete='RESTRICT')
+    )
+    start_date: Mapped[datetime] = mapped_column()
+    end_date: Mapped[datetime] = mapped_column()
+    active: Mapped[bool] = mapped_column(default=False)
+
+    company: Mapped['Company'] = relationship(back_populates='suscription')
 
 
 class User(BaseModel):

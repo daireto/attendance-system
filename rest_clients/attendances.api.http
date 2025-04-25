@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
     "full_name": "John Doe",
-    "document": "123456789",
+    "document": "1234567890",
     "document_type": "CC",
     "gender": "male",
     "birth_date": "2000-01-01",
