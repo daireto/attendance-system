@@ -1,0 +1,15 @@
+@hostname = localhost
+@port = 8002
+@host = {{hostname}}:{{port}}
+
+
+###
+# @prompt accessToken
+GET http://{{host}}/companies HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt nit
+GET http://{{host}}/companies/{{nit}} HTTP/1.1
+Authorization: Bearer {{accessToken}}

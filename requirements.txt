@@ -1,0 +1,8 @@
+aiosqlite
+argon2-cffi
+dummy-text-generator
+faker
+fastapi[standard]
+fastapi_auth_middleware
+pyjwt
+sqlactive

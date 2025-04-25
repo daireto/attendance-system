@@ -1,0 +1,34 @@
+@hostname = localhost
+@port = 8003
+@host = {{hostname}}:{{port}}
+
+
+###
+# @prompt accessToken
+GET http://{{host}}/attendances HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt uid
+GET http://{{host}}/attendances/{{uid}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+POST http://{{host}}/attendances HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "full_name": "John Doe",
+    "document": "123456789",
+    "document_type": "CC",
+    "birth_date": "2000-01-01",
+    "address": "123 Main St",
+    "reason": "Fever",
+    "admission_date": "2023-01-01",
+    "additional_data": {},
+    "company_id": "00000000-0000-0000-0000-000000000000",
+    "user_id": "00000000-0000-0000-0000-000000000000"
+}
