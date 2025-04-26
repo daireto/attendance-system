@@ -32,7 +32,7 @@ class Attendance(BaseModel):
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     full_name: Mapped[str] = mapped_column()
-    document: Mapped[str] = mapped_column(unique=True)
+    document: Mapped[str] = mapped_column()
     document_type: Mapped[DocumentType] = mapped_column(
         Enum(DocumentType),
     )
@@ -63,8 +63,8 @@ class Company(BaseModel):
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     nit: Mapped[str] = mapped_column(unique=True)
-    name: Mapped[str] = mapped_column(unique=True)
-    phone: Mapped[str] = mapped_column(unique=True)
+    name: Mapped[str] = mapped_column()
+    phone: Mapped[str] = mapped_column()
     center_type: Mapped[MedicalCenterType] = mapped_column(
         Enum(MedicalCenterType),
     )
