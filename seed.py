@@ -1,8 +1,9 @@
 import asyncio
 import logging
 import random
+import unicodedata
+from datetime import datetime, timedelta, timezone
 from collections.abc import Sequence
-from datetime import datetime
 from logging import getLogger
 
 from dummy_text_generator import (
@@ -12,19 +13,9 @@ from dummy_text_generator import (
 from faker import Faker
 from sqlactive import DBConnection
 
-from common.config import Settings
-from common.enums import Gender
-from common.models import (
-    Attendance,
-    BaseModel,
-    Company,
-    DocumentType,
-    MedicalCenterType,
-    OwnershipType,
-    User,
-    UserRole,
-)
-from common.utils import random_datetime, strip_accents
+from src.users import models as user_models, config as user_config, enums as user_enums
+from src.companies import models as company_models, config as company_config, enums as company_enums
+from src.attendances import models as attendance_models, config as attendance_config, enums as attendance_enums
 
 FAKER_LANG = 'es_CO'
 USERS_NUMBER = 100
@@ -36,20 +27,43 @@ logger = getLogger(__name__)
 logger.setLevel('DEBUG')
 logger.addHandler(logging.StreamHandler())
 
-conn = DBConnection(str(Settings.DATABASE_URL), echo=False)
+main_db_conn = DBConnection(str(user_config.Settings.DATABASE_URL), echo=False)
+attendance_db_conn = DBConnection(str(attendance_config.Settings.DATABASE_URL), echo=False)
 faker = Faker(FAKER_LANG)
 
 
+def random_datetime(
+    min_year: int = 1900,
+    max_year: int = datetime.now().year,
+    tz: timezone | None = None,
+) -> datetime:
+    start = datetime(min_year, 1, 1, 00, 00, 00, tzinfo=tz)
+    years = max_year - min_year + 1
+    end = start + timedelta(days=365 * years)
+    return start + (end - start) * random.random()
+
+
+def strip_accents(text: str) -> str:
+    return ''.join(
+        [
+            c
+            for c in unicodedata.normalize('NFKD', text)
+            if not unicodedata.combining(c)
+        ]
+    )
+
+
 async def connect():
-    logger.info('Connecting to database and initializing models...')
-    await conn.init_db(BaseModel)
-    logger.info('Database connected and models initialized')
+    logger.info('Connecting to databases and initializing models...')
+    await main_db_conn.init_db(BaseModel)
+    await attendance_db_conn.init_db(BaseModel)
+    logger.info('Databases connected and models initialized')
 
 
 async def disconnect():
-    logger.info('Disconnecting from database...')
+    logger.info('Disconnecting from databases...')
     await conn.close(BaseModel)
-    logger.info('Database disconnected')
+    logger.info('Databases disconnected')
 
 
 async def create_admin():
