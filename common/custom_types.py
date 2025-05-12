@@ -4,7 +4,7 @@ from sqlalchemy import JSON, TypeDecorator
 
 
 def _serialize_pydantic(value: Any) -> Any:
-    """Serializes a Pydantic model to a dictionary."""
+    """Serialize a Pydantic model to a dictionary."""
     if hasattr(value, 'model_dump'):
         return value.model_dump()
     return value.dict()
@@ -19,19 +19,27 @@ class PydanticType(TypeDecorator):
         from pydantic import BaseModel
         from sqlalchemy.orm import Mapped, mapped_column
 
-        class MyModel(BaseModel):
+        class Model(BaseModel):
             field: str
 
         class MyTable(Base):
             __tablename__ = 'my_table'
             pk: Mapped[int] = mapped_column(primary_key=True)
-            data: Mapped[MyModel] = mapped_column(PydanticType(MyModel))
-            data_list: Mapped[List[MyModel]] = mapped_column(PydanticType(List[MyModel]))
+            data: Mapped[Model] = mapped_column(PydanticType(Model))
+            data_list: Mapped[List[Model]] = mapped_column(PydanticType(List[Model]))
     """
 
     impl = JSON
 
     def __init__(self, pydantic_type: type) -> None:
+        """Initialize the PydanticType.
+
+        Parameters
+        ----------
+        pydantic_type : type
+            The Pydantic model type to store.
+
+        """
         super().__init__()
         self.pydantic_type = pydantic_type
         self.is_list = get_origin(pydantic_type) is list
@@ -40,7 +48,7 @@ class PydanticType(TypeDecorator):
         )
 
     def process_bind_param(self, value: Any, _: Any) -> Any:
-        """Converts Pydantic model(s) to dict(s) for storage."""
+        """Convert Pydantic model(s) to dict(s) for storage."""
         if value is None:
             return None
 
@@ -50,7 +58,7 @@ class PydanticType(TypeDecorator):
         return _serialize_pydantic(value)
 
     def process_result_value(self, value: Any, _: Any) -> Any:
-        """Converts stored dict(s) back to Pydantic model(s)."""
+        """Convert stored dict(s) back to Pydantic model(s)."""
         if value is None:
             return None
 

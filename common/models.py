@@ -46,16 +46,12 @@ class Attendance(BaseModel):
     company_id: Mapped[UUID] = mapped_column(
         ForeignKey('companies.uid', ondelete='RESTRICT')
     )
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey('users.uid', ondelete='RESTRICT')
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.uid', ondelete='RESTRICT'))
 
     company: Mapped['Company'] = relationship(
         back_populates='attendances', lazy='noload'
     )
-    user: Mapped['User'] = relationship(
-        back_populates='attendances', lazy='noload'
-    )
+    user: Mapped['User'] = relationship(back_populates='attendances', lazy='noload')
 
 
 class Company(BaseModel):
@@ -75,34 +71,28 @@ class Company(BaseModel):
         JSON,
     )
     additional_attendance_fields: Mapped[Optional[list[AdditionalAttendanceField]]] = (
-        mapped_column(
-            PydanticType(list[AdditionalAttendanceField]), nullable=True
-        )
+        mapped_column(PydanticType(list[AdditionalAttendanceField]), nullable=True)
     )
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey('users.uid', ondelete='RESTRICT')
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.uid', ondelete='RESTRICT'))
 
-    suscription: Mapped[Optional['Suscription']] = relationship(back_populates='company')
-    user: Mapped['User'] = relationship(
-        back_populates='companies', lazy='noload'
+    suscription: Mapped[Optional['Suscription']] = relationship(
+        back_populates='company'
     )
+    user: Mapped['User'] = relationship(back_populates='companies', lazy='noload')
     contact_numbers: Mapped[list['ContactNumber']] = relationship()
     attendances: Mapped[list['Attendance']] = relationship(
         back_populates='company', lazy='noload'
     )
 
     @classmethod
-    async def get_by_nit(cls, nit: str):
+    async def get_by_nit(cls, nit: str) -> 'Company | None':
         return await cls.find(nit=nit).one_or_none()
 
 
 class ContactNumber(BaseModel):
     __tablename__ = 'contact_numbers'
     __table_args__ = (
-        UniqueConstraint(
-            'country_code', 'number', name='_country_code_number_uc'
-        ),
+        UniqueConstraint('country_code', 'number', name='_country_code_number_uc'),
     )
 
     uid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
@@ -167,5 +157,5 @@ class User(BaseModel):
         return ph.verify(self.password, password)
 
     @classmethod
-    async def get_by_username(cls, username: str):
+    async def get_by_username(cls, username: str) -> 'User | None':
         return await cls.find(username=username).one_or_none()
