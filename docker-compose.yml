@@ -7,7 +7,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./db/users.sqlite3:/app/db/users.sqlite3
+      - ./db/:/app/db/
   users:
     build:
       dockerfile: src/users/Dockerfile
@@ -16,7 +16,7 @@ services:
     ports:
       - 8001:8001
     volumes:
-      - ./db/users.sqlite3:/app/db/users.sqlite3
+      - ./db/:/app/db/
   companies:
     build:
       dockerfile: src/companies/Dockerfile
@@ -24,6 +24,8 @@ services:
     env_file: .env
     ports:
       - 8002:8002
+    volumes:
+      - ./db/:/app/db/
   attendances:
     build:
       dockerfile: src/attendances/Dockerfile
@@ -31,6 +33,8 @@ services:
     env_file: .env
     ports:
       - 8003:8003
+    volumes:
+      - ./db/:/app/db/
   attendances-importer:
     build:
       dockerfile: src/attendances_importer/Dockerfile
