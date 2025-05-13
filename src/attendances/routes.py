@@ -26,7 +26,7 @@ def check_company_id(request: Request):
     if request.user.role == UserRole.ADMIN:
         return
     if not request.user.company_id:
-        raise NoCompanyId()
+        raise NoCompanyId
 
 
 @router.post(
@@ -71,7 +71,7 @@ async def get_attendance(request: Request, uid: UUID):
     check_company_id(request)
     attendance = await read_attendance(request.user, uid)
     if not attendance:
-        raise AttendanceNotFound()
+        raise AttendanceNotFound
 
     return AttendanceResponse.model_validate(attendance)
 

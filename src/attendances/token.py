@@ -1,12 +1,14 @@
 import json
+from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 import jwt
 from fastapi.security.utils import get_authorization_scheme_param
 from pydantic import BaseModel
-from starlette.authentication import BaseUser, SimpleUser, UnauthenticatedUser
+from starlette import authentication
 from starlette.datastructures import Headers
+from starlette.requests import HTTPConnection
 
 from .config import Settings
 from .enums import UserRole
@@ -21,8 +23,9 @@ class TokenPayload(BaseModel):
     company_id: UUID | None = None
 
 
-class AuthenticatedUser(SimpleUser):
-    def __init__(self, token_payload: TokenPayload) -> None:
+class AuthenticatedUser(authentication.SimpleUser):
+    def __init__(self, access_token: str, token_payload: TokenPayload) -> None:
+        self.access_token = access_token
         self.uid = token_payload.sub
         self.username = token_payload.username
         self.first_name = token_payload.first_name
@@ -42,15 +45,14 @@ class JSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def create_access_token(
-    data: TokenPayload, expires_delta: timedelta | None = None
-):
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=15)
-    )
+def create_access_token(data: TokenPayload, expires_delta: timedelta | None = None):
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
     payload = {**data.model_dump(), 'exp': expire}
     return jwt.encode(
-        payload, str(Settings.SECRET_KEY), algorithm=Settings.ALGORITHM, json_encoder=JSONEncoder
+        payload,
+        str(Settings.SECRET_KEY),
+        algorithm=Settings.ALGORITHM,
+        json_encoder=JSONEncoder,
     )
 
 
@@ -63,12 +65,41 @@ def decode_access_token(token: str) -> TokenPayload:
 
 def verify_authorization_header(
     headers: Headers,
-) -> tuple[list[UserRole], BaseUser]:
+) -> tuple[list[UserRole], authentication.BaseUser]:
     authorization = headers.get('Authorization')
     scheme, param = get_authorization_scheme_param(authorization)
     if not scheme or not param:
-        return [], UnauthenticatedUser()
+        return [], authentication.UnauthenticatedUser()
 
     payload = decode_access_token(param)
     scopes = [payload.role]
-    return scopes, AuthenticatedUser(payload)
+    return scopes, AuthenticatedUser(param, payload)
+
+
+def has_required_scope(conn: HTTPConnection, scopes: Sequence[str]) -> bool:
+    if not scopes:
+        return True
+
+    if not conn.auth.scopes:
+        return False
+
+    target_role = scopes[0]
+    user_role = conn.auth.scopes[0]
+
+    if target_role == UserRole.COMPANY_MANAGER:
+        return user_role in (
+            UserRole.ADMIN,
+            UserRole.COMPANY_MANAGER,
+        )
+
+    if target_role == UserRole.ATTENDANCE_OFFICER:
+        return user_role in (
+            UserRole.ADMIN,
+            UserRole.COMPANY_MANAGER,
+            UserRole.ATTENDANCE_OFFICER,
+        )
+
+    return user_role == target_role
+
+
+authentication.has_required_scope = has_required_scope

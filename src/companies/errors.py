@@ -18,6 +18,14 @@ class CompanyNotFound(HTTPException):
         )
 
 
+class CompanyAlreadyExists(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Company already exists',
+        )
+
+
 class NoCompanyId(HTTPException):
     def __init__(self) -> None:
         super().__init__(

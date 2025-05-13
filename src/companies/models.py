@@ -40,8 +40,6 @@ class Company(BaseModel):
     ] = mapped_column(
         PydanticType(list[AdditionalAttendanceField]), nullable=True
     )
-    manager_id: Mapped[UUID] = mapped_column()
-    subscription_id: Mapped[Optional[UUID]] = mapped_column(nullable=True)
     created_by: Mapped[Optional[UUID]] = mapped_column(nullable=True)
     updated_by: Mapped[Optional[UUID]] = mapped_column(nullable=True)
 

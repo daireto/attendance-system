@@ -4,5 +4,9 @@ dummy-text-generator
 faker
 fastapi[standard]
 fastapi_auth_middleware
+httpx
+openpyxl
+orjson
 pyjwt
+python-multipart
 sqlactive

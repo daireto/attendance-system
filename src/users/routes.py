@@ -16,25 +16,25 @@ def check_company_id(request: Request):
     if request.user.role == UserRole.ADMIN:
         return
     if not request.user.company_id:
-        raise NoCompanyId()
+        raise NoCompanyId
 
 
 @router.post('/users/', response_model=UserResponse, tags=['users'])
-@requires([UserRole.ADMIN, UserRole.COMPANY_MANAGER])
+@requires(UserRole.COMPANY_MANAGER)
 async def create_user(request: Request, data: UserCreate):
     check_company_id(request)
     if request.user.role != UserRole.ADMIN and data.role in (
         UserRole.ADMIN,
         UserRole.COMPANY_MANAGER,
     ):
-        raise Forbidden()
+        raise Forbidden
 
     user = await create_new_user(request.user, data)
     return UserResponse.model_validate(user)
 
 
 @router.get('/users/', response_model=list[UserResponse], tags=['users'])
-@requires([UserRole.ADMIN.value, UserRole.COMPANY_MANAGER.value])
+@requires(UserRole.COMPANY_MANAGER)
 async def get_users(
     request: Request,
     skip: int = 0,
@@ -52,7 +52,7 @@ async def get_user(request: Request, uid: UUID):
     check_company_id(request)
     user = await read_user(request.user, uid)
     if not user:
-        raise UserNotFound()
+        raise UserNotFound
 
     return UserResponse.model_validate(user)
 
@@ -67,7 +67,7 @@ async def get_user_by_username(request: Request, username: str):
     check_company_id(request)
     user = await read_user(request.user, username)
     if not user:
-        raise UserNotFound()
+        raise UserNotFound
 
     return UserResponse.model_validate(user)
 
@@ -78,7 +78,7 @@ async def modify_user(request: Request, uid: UUID, data: UserUpdate):
     check_company_id(request)
     user = await update_user(request.user, uid, data)
     if not user:
-        raise UserNotFound()
+        raise UserNotFound
 
     return UserResponse.model_validate(user)
 
@@ -91,7 +91,7 @@ async def delete_user(request: Request, uid: UUID):
     check_company_id(request)
     user = await read_user(request.user, uid)
     if not user:
-        raise UserNotFound()
+        raise UserNotFound
 
     uid = user.uid
     await user.delete()

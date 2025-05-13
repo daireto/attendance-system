@@ -19,7 +19,6 @@ class CompanyBase(BaseModel):
     ownership_type: OwnershipType
     addresses: list[str] = []
     additional_attendance_fields: list[AdditionalAttendanceField] | None = None
-    manager_id: UUID
 
 
 class CompanyCreate(CompanyBase):
@@ -41,7 +40,5 @@ class CompanyResponse(BaseModel):
     ownership_type: OwnershipType
     addresses: list[str] = []
     additional_attendance_fields: list[AdditionalAttendanceField] | None = None
-    manager_id: UUID
-    subscription_id: UUID | None = None
     created_by: UUID | None = None
     updated_by: UUID | None = None

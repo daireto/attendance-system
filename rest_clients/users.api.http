@@ -23,6 +23,60 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @prompt accessToken
+# @prompt uid
+GET http://{{host}}/users/{{uid}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
 # @prompt username
-GET http://{{host}}/users/{{username}} HTTP/1.1
+GET http://{{host}}/users/by_username/{{username}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt company_id
+POST http://{{host}}/users HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "username": "johnny1",
+    "password": "Johnny1!",
+    "confirm_password": "Johnny1!",
+    "email": "johnny1@yopmail.com",
+    "document": "1234567890",
+    "document_type": "CC",
+    "first_name": "Johnny",
+    "last_name": "Bravo",
+    "birth_date": "2000-01-01",
+    "role": "attendance_officer",
+    "phone_number": "1234567890",
+    "company_id": "{{company_id}}"
+}
+
+###
+# @prompt accessToken
+# @prompt uid
+# @prompt company_id
+PUT http://{{host}}/users/{{uid}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "email": "johnny1@yopmail.com",
+    "document": "1234567890",
+    "document_type": "CC",
+    "first_name": "Johnny",
+    "last_name": "Bravo",
+    "birth_date": "2000-01-01",
+    "role": "attendance_officer",
+    "phone_number": "1234567890",
+    "company_id": "{{company_id}}"
+}
+
+###
+# @prompt accessToken
+# @prompt uid
+DELETE http://{{host}}/users/{{uid}} HTTP/1.1
 Authorization: Bearer {{accessToken}}

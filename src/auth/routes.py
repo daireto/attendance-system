@@ -31,6 +31,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             first_name=user.first_name,
             last_name=user.last_name,
             role=user.role,
+            company_id=user.company_id,
         ),
         expires_delta=expiration,
     )

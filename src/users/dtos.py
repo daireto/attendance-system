@@ -1,4 +1,5 @@
 from datetime import datetime
+from email.policy import default
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -20,6 +21,7 @@ class UserBase(BaseModel):
     birth_date: datetime
     role: UserRole
     phone_number: str
+    company_id: UUID | None = None
 
 
 class UserCreate(UserBase):
@@ -35,8 +37,8 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    password: str | None = Field(min_length=8, max_length=100)
-    confirm_password: str | None = Field(min_length=8, max_length=100)
+    password: str | None = Field(min_length=8, max_length=100, default=None)
+    confirm_password: str | None = Field(min_length=8, max_length=100, default=None)
 
     @field_validator('confirm_password')
     def passwords_match(cls, v, values):

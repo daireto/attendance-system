@@ -6,9 +6,9 @@ config = Config()
 
 class Settings:
     DATABASE_URL = config(
-        'MAIN_DATABASE_URL',
+        'USERS_DATABASE_URL',
         cast=Secret,
-        default='sqlite+aiosqlite:///./db/main.sqlite3',
+        default='sqlite+aiosqlite:///./db/users.sqlite3',
     )
     SECRET_KEY = config('SECRET_KEY', cast=Secret, default='your-secret-key')
     ALGORITHM = config('ALGORITHM', default='HS256')

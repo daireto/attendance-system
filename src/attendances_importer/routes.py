@@ -1,54 +1,24 @@
-from uuid import UUID
-
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 from starlette.authentication import requires
 from starlette.requests import Request
 
-from .dtos import AttendanceCreate, AttendanceResponse
 from .enums import UserRole
-from .errors import AttendanceNotFound
-from .models import Attendance
-from .service import create_new_attendance, fetch_attendances
+from .errors import InvalidExtension, NoFilename
+from .service import from_csv, from_excel
 
 router = APIRouter()
 
 
-@router.post(
-    '/attendances/', response_model=AttendanceResponse, tags=['attendances']
-)
-@requires(UserRole.ADMIN)
-async def create_attendance(request: Request, data: AttendanceCreate):
-    attendance = await create_new_attendance(request.user.uid, data)
-    return AttendanceResponse.model_validate(attendance)
+@router.post('/attendances/import', tags=['attendances'])
+@requires(UserRole.ATTENDANCE_OFFICER)
+async def read_file(request: Request, file: UploadFile):
+    if not file.filename:
+        raise NoFilename
 
+    if file.filename.endswith('.csv'):
+        return await from_csv(request.user.access_token, file)
 
-@router.get(
-    '/attendances/',
-    response_model=list[AttendanceResponse],
-    tags=['attendances'],
-)
-@requires(UserRole.ADMIN)
-async def get_attendances(
-    request: Request,
-    skip: int = 0,
-    limit: int = 100,
-    search: str | None = None,
-):
-    attendances = await fetch_attendances(skip, limit, search)
-    return [
-        AttendanceResponse.model_validate(attendance)
-        for attendance in attendances
-    ]
+    if file.filename.endswith('.xlsx'):
+        return await from_excel(request.user.access_token, file)
 
-
-@router.get(
-    '/attendances/{uid:uuid}',
-    response_model=AttendanceResponse,
-    tags=['attendances'],
-)
-@requires(UserRole.ADMIN)
-async def get_attendance(request: Request, uid: UUID):
-    attendance = await Attendance.get(uid)
-    if not attendance:
-        raise AttendanceNotFound()
-    return AttendanceResponse.model_validate(attendance)
+    raise InvalidExtension

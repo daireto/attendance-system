@@ -10,6 +10,40 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @prompt accessToken
-# @prompt nit
-GET http://{{host}}/companies/{{nit}} HTTP/1.1
+# @prompt uid
+GET http://{{host}}/companies/{{uid}} HTTP/1.1
 Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt nit
+GET http://{{host}}/companies/by_nit/{{nit}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt search
+GET http://{{host}}/companies?search={{search}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+# @prompt skip
+# @prompt limit
+GET http://{{host}}/companies?skip={{skip}}&limit={{limit}} HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+# @prompt accessToken
+POST http://{{host}}/companies HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "nit": "1234567890",
+    "name": "Hospital San Pedro",
+    "contact_number": "1234567890",
+    "center_type": "hospital",
+    "ownership_type": "private",
+    "addresses": ["Carrera 12 # 12-12"]
+}

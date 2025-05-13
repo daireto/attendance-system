@@ -3,9 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi_auth_middleware import AuthMiddleware
 
-from shared.token import verify_authorization_header
-
 from .routes import router
+from .token import verify_authorization_header
 
 app = FastAPI(title='Attendances Importer Service')
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=['*'])
@@ -21,4 +20,4 @@ app.include_router(router)
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app, host='0.0.0.0', port=8003)
+    uvicorn.run(app, host='0.0.0.0', port=8004)

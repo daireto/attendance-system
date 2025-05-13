@@ -1,12 +1,38 @@
+import json
 from uuid import UUID
 
+import httpx
 from argon2 import PasswordHasher
 from fastapi import HTTPException
 
+from .config import Settings
 from .dtos import UserCreate, UserUpdate
 from .enums import UserRole
+from .errors import CompanyRequired, UserAlreadyExists
 from .models import User
 from .token import AuthenticatedUser
+
+
+async def fetch_company_by_id(company_id: UUID, access_token: str):
+    async with httpx.AsyncClient() as client:
+        return await client.get(
+            f'{Settings.COMPANIES_URL}/companies/{company_id}',
+            headers={'Authorization': 'Bearer ' + access_token},
+        )
+
+
+async def check_company_exists(company_id: UUID, access_token: str):
+    company_response = await fetch_company_by_id(company_id, access_token)
+    if company_response.is_error:
+        try:
+            detail = company_response.json()['detail']
+        except (json.decoder.JSONDecodeError, KeyError):
+            detail = company_response.text
+
+        raise HTTPException(
+            status_code=company_response.status_code,
+            detail=detail,
+        )
 
 
 async def fetch_users(
@@ -36,10 +62,7 @@ async def read_user(read_by: AuthenticatedUser, uid_or_username: str | UUID):
     if not user:
         return None
 
-    if (
-        read_by.role != UserRole.ADMIN
-        and user.company_id != read_by.company_id
-    ):
+    if read_by.role != UserRole.ADMIN and user.company_id != read_by.company_id:
         return None
 
     return user
@@ -48,9 +71,7 @@ async def read_user(read_by: AuthenticatedUser, uid_or_username: str | UUID):
 async def create_new_user(created_by: AuthenticatedUser, data: UserCreate):
     user = await User.get_by_username(username=data.username)
     if user:
-        raise HTTPException(
-            status_code=400, detail='Username already registered'
-        )
+        raise UserAlreadyExists
 
     ph = PasswordHasher()
     data.password = ph.hash(data.password)
@@ -58,16 +79,23 @@ async def create_new_user(created_by: AuthenticatedUser, data: UserCreate):
     create_data = data.model_dump()
     create_data.pop('confirm_password', None)
 
+    if created_by.role != UserRole.ADMIN:
+        create_data['company_id'] = created_by.company_id
+
+    if data.role != UserRole.ADMIN:
+        company_id = create_data.get('company_id')
+        if not company_id:
+            raise CompanyRequired
+
+        await check_company_exists(company_id, created_by.access_token)
+
     return await User.create(
         **create_data,
-        company_id=created_by.company_id,
         created_by=created_by.uid,
     )
 
 
-async def update_user(
-    updated_by: AuthenticatedUser, uid: UUID, data: UserUpdate
-):
+async def update_user(updated_by: AuthenticatedUser, uid: UUID, data: UserUpdate):
     user = await read_user(updated_by, uid)
     if not user:
         return None
@@ -78,5 +106,15 @@ async def update_user(
     update_data = data.model_dump()
     update_data.pop('password', None)
     update_data.pop('confirm_password', None)
+
+    if updated_by.role != UserRole.ADMIN:
+        update_data['company_id'] = updated_by.company_id
+
+    if data.role != UserRole.ADMIN:
+        company_id = update_data.get('company_id')
+        if not company_id:
+            raise CompanyRequired
+
+        await check_company_exists(company_id, updated_by.access_token)
 
     return await user.update(**update_data, updated_by=updated_by.uid)

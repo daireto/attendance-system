@@ -17,9 +17,25 @@ class UserNotFound(HTTPException):
         )
 
 
+class UserAlreadyExists(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='User already exists',
+        )
+
+
 class NoCompanyId(HTTPException):
     def __init__(self) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='User does not belong to any company',
+        )
+
+
+class CompanyRequired(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Company id is required',
         )
