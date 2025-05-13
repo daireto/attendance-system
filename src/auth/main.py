@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -14,7 +15,8 @@ conn = DBConnection(str(Settings.DATABASE_URL), echo=False)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await conn.init_db(BaseModel)
+    await asyncio.sleep(5)
+    BaseModel.set_session(conn.async_scoped_session)
     yield
     await conn.close(BaseModel)
 

@@ -1,5 +1,3 @@
-from datetime import datetime
-from email.policy import default
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -18,7 +16,6 @@ class UserBase(BaseModel):
     document_type: DocumentType
     first_name: str = Field(min_length=2, max_length=50)
     last_name: str = Field(min_length=2, max_length=50)
-    birth_date: datetime
     role: UserRole
     phone_number: str
     company_id: UUID | None = None
@@ -57,7 +54,6 @@ class UserResponse(BaseModel):
     document_type: DocumentType
     first_name: str
     last_name: str
-    birth_date: datetime
     role: UserRole
     phone_number: str
     company_id: UUID | None = None

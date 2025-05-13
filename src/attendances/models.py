@@ -20,9 +20,9 @@ class Attendance(BaseModel):
     full_name: Mapped[str] = mapped_column()
     document: Mapped[str] = mapped_column()
     document_type: Mapped[DocumentType] = mapped_column(
-        Enum(DocumentType),
+        Enum(DocumentType, name='document_type'),
     )
-    gender: Mapped[Gender] = mapped_column(Enum(Gender))
+    gender: Mapped[Gender] = mapped_column(Enum(Gender, name='gender'))
     birth_date: Mapped[datetime] = mapped_column()
     address: Mapped[str] = mapped_column()
     reason: Mapped[str] = mapped_column()

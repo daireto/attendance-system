@@ -27,18 +27,16 @@ class Company(BaseModel):
     name: Mapped[str] = mapped_column()
     contact_number: Mapped[str] = mapped_column()
     center_type: Mapped[MedicalCenterType] = mapped_column(
-        Enum(MedicalCenterType),
+        Enum(MedicalCenterType, name='medical_center_type'),
     )
     ownership_type: Mapped[OwnershipType] = mapped_column(
-        Enum(OwnershipType),
+        Enum(OwnershipType, name='ownership_type'),
     )
     addresses: Mapped[list[str]] = mapped_column(
         JSON,
     )
-    additional_attendance_fields: Mapped[
-        Optional[list[AdditionalAttendanceField]]
-    ] = mapped_column(
-        PydanticType(list[AdditionalAttendanceField]), nullable=True
+    additional_attendance_fields: Mapped[Optional[list[AdditionalAttendanceField]]] = (
+        mapped_column(PydanticType(list[AdditionalAttendanceField]), nullable=True)
     )
     created_by: Mapped[Optional[UUID]] = mapped_column(nullable=True)
     updated_by: Mapped[Optional[UUID]] = mapped_column(nullable=True)

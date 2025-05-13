@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -29,7 +28,6 @@ class UserResponse(BaseModel):
     document_type: DocumentType
     first_name: str
     last_name: str
-    birth_date: datetime
     role: UserRole
     phone_number: str
     company_id: UUID | None = None

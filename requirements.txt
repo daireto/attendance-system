@@ -1,5 +1,7 @@
 aiosqlite
 argon2-cffi
+asyncmy
+cryptography
 dummy-text-generator
 faker
 fastapi[standard]
@@ -8,5 +10,6 @@ httpx
 openpyxl
 orjson
 pyjwt
+python-dotenv
 python-multipart
 sqlactive

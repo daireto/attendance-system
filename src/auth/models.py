@@ -1,8 +1,8 @@
-from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
 from argon2 import PasswordHasher
+from argon2.exceptions import VerificationError
 from sqlactive import ActiveRecordBaseModel
 from sqlalchemy import Enum
 from sqlalchemy.orm import Mapped, mapped_column
@@ -23,13 +23,12 @@ class User(BaseModel):
     email: Mapped[str] = mapped_column(unique=True)
     document: Mapped[str] = mapped_column(unique=True)
     document_type: Mapped[DocumentType] = mapped_column(
-        Enum(DocumentType),
+        Enum(DocumentType, name='document_type'),
     )
     first_name: Mapped[str] = mapped_column()
     last_name: Mapped[str] = mapped_column()
-    birth_date: Mapped[datetime] = mapped_column()
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole),
+        Enum(UserRole, name='user_role'),
     )
     phone_number: Mapped[str] = mapped_column()
     company_id: Mapped[Optional[UUID]] = mapped_column(nullable=True)
@@ -42,7 +41,10 @@ class User(BaseModel):
 
     def verify_password(self, password: str) -> bool:
         ph = PasswordHasher()
-        return ph.verify(self.password, password)
+        try:
+            return ph.verify(self.password, password)
+        except VerificationError:
+            return False
 
     @classmethod
     async def get_by_username(cls, username: str) -> 'User | None':

@@ -1,0 +1,40 @@
+services:
+  auth:
+    build:
+      dockerfile: src/auth/Dockerfile
+      context: .
+    env_file: .env
+    ports:
+      - 8000:8000
+    volumes:
+      - ./db/users.sqlite3:/app/db/users.sqlite3
+  users:
+    build:
+      dockerfile: src/users/Dockerfile
+      context: .
+    env_file: .env
+    ports:
+      - 8001:8001
+    volumes:
+      - ./db/users.sqlite3:/app/db/users.sqlite3
+  companies:
+    build:
+      dockerfile: src/companies/Dockerfile
+      context: .
+    env_file: .env
+    ports:
+      - 8002:8002
+  attendances:
+    build:
+      dockerfile: src/attendances/Dockerfile
+      context: .
+    env_file: .env
+    ports:
+      - 8003:8003
+  attendances-importer:
+    build:
+      dockerfile: src/attendances_importer/Dockerfile
+      context: .
+    env_file: .env
+    ports:
+      - 8004:8004

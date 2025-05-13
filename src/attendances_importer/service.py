@@ -18,7 +18,6 @@ BASE_FIELDS = [
     'document',
     'document_type',
     'gender',
-    'birth_date',
     'address',
     'reason',
 ]

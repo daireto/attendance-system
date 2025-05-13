@@ -49,7 +49,6 @@ Content-Type: application/json
     "document_type": "CC",
     "first_name": "Johnny",
     "last_name": "Bravo",
-    "birth_date": "2000-01-01",
     "role": "attendance_officer",
     "phone_number": "1234567890",
     "company_id": "{{company_id}}"
@@ -69,7 +68,6 @@ Content-Type: application/json
     "document_type": "CC",
     "first_name": "Johnny",
     "last_name": "Bravo",
-    "birth_date": "2000-01-01",
     "role": "attendance_officer",
     "phone_number": "1234567890",
     "company_id": "{{company_id}}"
